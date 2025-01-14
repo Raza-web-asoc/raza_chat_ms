@@ -114,7 +114,7 @@ async def last_id(pets: list[int]):
                 return 0
         else:
             raise HTTPException(status_code=400, detail="El chat entre estas dos mascotas aún no existe")
-    except:
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -139,6 +139,6 @@ async def chats_available(pet_id: int):
         
         else:
             return chats
-    except:
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
     
