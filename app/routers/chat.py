@@ -1,93 +1,27 @@
 from fastapi import APIRouter, HTTPException
-from app.db.connection import db
-from datetime import datetime
+from app.controllers.chat_controller import get_all_chats, save_message, get_chat, new_chat, chats_available  # Importar las funciones del controlador
+from app.models import MessageRequest
 
-router_chats = APIRouter(prefix="/chats")
-
-@router_chats.get("/") 
-def read_root(): 
-    return {"message": "Hello, FastAPI with Docker!"}
-
-
+router_chats = APIRouter()
 
 @router_chats.get("/all")
-async def get_chats():
-    if db is None:
-        raise HTTPException(status_code=500, detail="No hay conexión a la base de datos")
-
-    try:
-        collection = db["chats"]
-        
-        query = {}
-
-        results = list(collection.find(query, {"_id": 0}))
-        return {"data": results, "count": len(results)}
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-
-@router_chats.get("/{pet1}/{pet2}")
-async def get_chat_by_value_in_array(pet1: int, pet2: int):
-    if db is None:
-        raise HTTPException(status_code=500, detail="No hay conexión a la base de datos")
-
-    try:
-        collection = db["chats"] 
-
-        query_filter = {"pets": {"$all": [pet1, pet2]}}
-
-        # Realizar la consulta
-        results = list(collection.find(query_filter, {"_id": 0}))
-
-        if not results:
-            raise HTTPException(status_code=404, detail="No se encontraron resultados")
-
-        return {"data": results, "count": len(results)}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
+async def read_all_chats():
+    return await get_all_chats()
 
 @router_chats.post("/save-message")
-async def save_message(pets: list[int], pet_id: int, message: str):
-    if db is None:
-        raise HTTPException(status_code=500, detail="No hay conexión a la base de datos")
+async def create_message(request: MessageRequest):
+    return await save_message(request)
 
-    if len(pets) != 2:
-        raise HTTPException(status_code=400, detail="El campo 'pets' debe contener exactamente 2 IDs")
+@router_chats.get("/get-chat/{pet_id1}/{pet_id2}")
+async def read_chat(pet_id1: int, pet_id2: int):    
+    pets = [pet_id1, pet_id2]
+    return await get_chat(pets)
 
-    try:
-        # Nombre de la colección
-        collection = db["chats"]
+@router_chats.post("/create-chat/{pet_id1}/{pet_id2}")
+async def create_chat(pet_id1: int, pet_id2: int):
+    pets = [pet_id1, pet_id2]
+    return await new_chat(pets)
 
-        # Buscar el documento correspondiente al par de `pets`
-        chat = collection.find_one({"pets": {"$all": pets}})
-
-        # Crear un nuevo mensaje
-        new_message = {
-            "pet_id": pet_id,
-            "message": message,
-            "timestamp": datetime.utcnow()
-        }
-
-        if chat:
-            # Si el documento ya existe, actualizar el arreglo de mensajes
-            collection.update_one(
-                {"_id": chat["_id"]},
-                {"$push": {"messages": new_message}}
-            )
-        else:
-            # Si no existe, crear un nuevo documento
-            new_chat = {
-                "pets": pets,
-                "messages": [new_message]
-            }
-            collection.insert_one(new_chat)
-
-        return {"message": "Mensaje guardado exitosamente"}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router_chats.get("/get-available-chats/{pet_id}")
+async def read_all_pet_chats(pet_id: int):
+    return await chats_available(pet_id)

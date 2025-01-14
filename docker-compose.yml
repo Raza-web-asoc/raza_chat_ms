@@ -1,16 +1,42 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
+  raza-chats-ms:
+    build: .
+    container_name: raza-chats-ms
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    depends_on:
+      raza-chats-db:
+        condition: service_healthy
     volumes:
       - .:/app
-    command: >
-      uvicorn app.main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
+    networks:
+      - autenticador_network
 
+  raza-chats-db:
+    image: mongo:6.0
+    container_name: raza-chats-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: chatdev
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - autenticador_network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  autenticador_network:
+    external: true
+
+volumes:
+  mongo_data:

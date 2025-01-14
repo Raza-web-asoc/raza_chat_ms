@@ -3,12 +3,14 @@ This module is focused on chat functionality
 
 # clone
 git clone ...
-
-python -m venv venv
-.\venv\Scripts\activate       # Windows
 pip install -r requirements.txt
 
 # commands for docker
-docker build -t chat .
+docker network create autenticador_network
 
-docker run -d -p 8000:8000 chat
+docker-compose up --build
+
+docker-compose logs
+
+docker-compose logs raza-chats-ms
+docker-compose logs raza-chats-db

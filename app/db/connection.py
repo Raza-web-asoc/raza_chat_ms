@@ -1,14 +1,16 @@
-import os
-from pymongo import MongoClient
-from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 
-
-load_dotenv()
-
-
-MONGODB_URI = os.getenv("MONGODB_URI")
+# Configuración de la conexión
+# MONGO_URI = "mongodb://root:root@raza-chats-db:27017"
+MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "chat_app"
 
+# Crear cliente MongoDB (Motor)
+client = AsyncIOMotorClient(MONGO_URI)
 
-client = MongoClient(MONGODB_URI)
-db = client[DATABASE_NAME]
+# Seleccionar la base de datos
+database = client[DATABASE_NAME]
+
+# Exportar las variables
+__all__ = ["database", "client"]
+
