@@ -5,7 +5,7 @@ services:
     build: .
     container_name: raza-chats-ms
     ports:
-      - "8001:8000"
+      - "8005:8000"
     depends_on:
       raza-chats-db:
         condition: service_healthy
@@ -20,11 +20,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: chatdev
     ports:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - autenticador_network
     restart: always

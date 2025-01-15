@@ -9,6 +9,8 @@ pip install -r requirements.txt
 docker network create autenticador_network
 
 docker-compose up --build
+docker-compose down
+docker volume rm raza_chat_ms_mongo_data
 
 docker-compose logs
 
