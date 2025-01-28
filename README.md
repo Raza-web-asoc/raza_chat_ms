@@ -5,6 +5,8 @@ This module is focused on chat functionality
 git clone ...
 pip install -r requirements.txt
 
+venv\Scripts\activate
+
 # commands for docker
 docker network create autenticador_network
 
