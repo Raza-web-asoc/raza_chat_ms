@@ -1,16 +1,18 @@
+import os
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
-# Configuración de la conexión
-MONGO_URI = "mongodb://root:root@raza-chats-db:27017/chat_app"
-# MONGO_URI = "mongodb://localhost:27017/"
+load_dotenv()
+
+MONGO_URI = os.environ.get("MONGODB_URI")  # Obtiene la URI de la variable de entorno
 DATABASE_NAME = "chat_app"
 
-# Crear cliente MongoDB (Motor)
-client = AsyncIOMotorClient(MONGO_URI)
+try:
+    client = AsyncIOMotorClient(MONGO_URI)
+    database = client[DATABASE_NAME]
+    print("Conexión a MongoDB Atlas establecida.")
+except Exception as e:
+    print(f"Error al conectar a MongoDB Atlas: {e}")
+    # Maneja el error de conexión (por ejemplo, sal del programa)
 
-# Seleccionar la base de datos
-database = client[DATABASE_NAME]
-
-# Exportar las variables
 __all__ = ["database", "client"]
-
